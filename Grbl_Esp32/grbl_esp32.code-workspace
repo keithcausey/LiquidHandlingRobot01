@@ -1,0 +1,18 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "extensions": {
+        "recommendations": [
+            "platformio.platformio-ide"
+        ]
+    },
+    "settings": {
+        "terminal.integrated.env.windows": {
+            "PATH": "${env:PATH};${env:USERPROFILE}\\.platformio\\penv\\Scripts",
+            "PLATFORMIO_CALLER": "vscode"
+        }
+    }
+}

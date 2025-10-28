@@ -1,0 +1,11 @@
+This directory is intended for project header files.
+
+A header file with the same name as a library folder (library.h) will be
+treated as the main header file for that library. Library source files will
+be compiled into a static library and linked to main executable file.
+
+PlatformIO will automatically scan include directories and generate proper
+preprocessor flags.
+
+More information about PlatformIO Project Dependencies:
+- https://docs.platformio.org/en/latest/librarymanager/dependencies.html
