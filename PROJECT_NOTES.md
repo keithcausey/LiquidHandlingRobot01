@@ -1,19 +1,25 @@
 # GRBL ESP32 Project Context
 
 ## Project Overview
-- **Project Name**: GRBL ESP32 CNC Controller Testing
+- **Project Name**: GRBL ESP32 Liquid Handling/Pipetting Robot
 - **Date Started**: October 28, 2025
 - **Previous Context**: Migrated from stirringbioreactor project - lost chat context during transition
 
 ## Current Objectives
-- Testing GRBL ports on ESP32
-- Configuring machine-specific pin mappings
-- Validating communication and control functionality
+- Testing GRBL ports on ESP32S3 for liquid handling robot
+- Configuring 4-axis machine (X,Y,Z motion + A-axis syringe pump)
+- Validating 74HC595 shift register control for stepper drivers
+- Testing serial communication and port configuration
 
 ## Hardware Setup
-- ESP32 Development Board: [TO BE SPECIFIED]
-- Machine Configuration: [TO BE SPECIFIED]
-- Connected Peripherals: [TO BE SPECIFIED]
+- **ESP32 Board**: ESP32S3 Development Kit
+- **Serial Ports**: COM11 and COM7 (currently using COM7)
+- **Axes**: 4-axis system (X,Y,Z motion + A-axis syringe pump)
+- **Stepper Control**: 3x 74HC595 shift registers
+- **GPIO Assignments**:
+  - GPIO 4, 5, 6: Control 74HC595 shift registers
+  - GPIO 19: Common stepper enable (ANDed with emergency cutoff)
+- **Application**: Liquid handling/pipetting robot
 
 ## Testing Status
 - [ ] Basic ESP32 communication test
