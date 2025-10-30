@@ -47,12 +47,13 @@ Based on `/src/Machines/` directory:
 - ESP32S3 specific configs
 - Test drive mode (test_drive.h)
 
-### Next Actions 
+### Next Actions - Current Status
 1. ✅ **Context Recovered**: Liquid handling robot with 74HC595 control
 2. ✅ **Test Program Found**: verification_test.cpp ready to run
-3. 🎯 **Resume Testing**: Continue 74HC595 verification where we left off
-4. **Serial Port**: Continue using COM7 (COM11 had issues)
-5. **Test Sequence**: Run the comprehensive verification test program
+3. 🔄 **Debugging Boot Issue**: ESP32S3 shows boot ROM but program not running
+4. **Ports Available**: COM11 and COM7 (both are this ESP32S3)
+5. **Current Upload**: Testing simple boot program on COM7 with USB CDC enabled
+6. **Next**: If COM7 works, restore full 74HC595 verification test
 
 ### Issues/Questions
 - Which machine configuration file should be used?
