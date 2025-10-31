@@ -7,9 +7,9 @@ ESP32S3 USB CDC (virtual COM port) often corrupts serial communication in Arduin
 
 ### Hardware Setup
 - **Two USB cables** connected to ESP32S3 DevKit
-- **COM12** = Programming port (USB CDC disabled)
-- **COM13** = Would be USB CDC port (not used)
-- **GPIO 43** = Hardware UART TX (serial output)
+- **COM12** = Programming port (for uploading firmware)
+- **COM13** = Connected to PuTTY for monitoring (but not used for our serial output)
+- **GPIO 43** = Hardware UART TX (serial output - connect to USB-to-serial adapter)
 - **GPIO 44** = Hardware UART RX (serial input)
 
 ### PlatformIO Configuration (platformio.ini)
@@ -19,7 +19,7 @@ platform = espressif32
 board = esp32-s3-devkitc-1
 framework = arduino
 monitor_speed = 115200
-monitor_port = COM13        ; Not used, but configured
+monitor_port = COM13        ; PuTTY connected but not used for our output
 upload_port = COM12         ; Programming via this port
 upload_speed = 921600
 build_flags = 
@@ -55,9 +55,9 @@ void loop() {
 
 ### Expected Results
 - **Programming**: Works normally via COM12 (USB CDC for esptool)
-- **Serial output**: Clean, readable text on GPIO 43 at 115200 baud
-- **Boot messages**: Still appear on USB CDC (normal)
-- **Program output**: Only on hardware UART GPIO 43
+- **Serial output**: Clean, readable text on GPIO 43 at 115200 baud (via USB-to-serial adapter)
+- **COM13**: PuTTY connected but shows corrupted USB CDC output (not used)
+- **Program output**: Only reliable on hardware UART GPIO 43
 
 ### Hardware Connection for Serial Reading
 - **USB-to-Serial adapter** or **oscilloscope** to GPIO 43
@@ -77,9 +77,10 @@ When working correctly, you should see:
 3. **Program output**: Clean serial text on GPIO 43 hardware UART
 
 ## Troubleshooting
-- If upload fails: Check COM12 port assignment
-- If no serial output: Verify GPIO 43 connection and 115200 baud
-- If garbled text: Ensure ARDUINO_USB_CDC_ON_BOOT=0 is set
+- If upload fails: Check COM12 port assignment for programming
+- If no serial output: Verify GPIO 43 connection and 115200 baud on USB-to-serial adapter
+- If garbled text on COM13: This is expected - use GPIO 43 hardware UART instead
+- If garbled text on GPIO 43: Ensure ARDUINO_USB_CDC_ON_BOOT=0 is set
 - If stuck in boot: Try different GPIO pins, avoid conflicting pins
 
 ---
