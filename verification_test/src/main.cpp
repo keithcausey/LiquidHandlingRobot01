@@ -45,7 +45,7 @@ void setup() {
     Serial1.println(Z_LIMIT_PIN);
     Serial1.print("  A-axis: GPIO");
     Serial1.println(A_LIMIT_PIN);
-    Serial1.println("Note: Limit switches active LOW (grounded when triggered)");
+    Serial1.println("Note: Limit switches active HIGH (3.3V when triggered, LOW when normal)");
     Serial1.println("Hardware UART on GPIO 43 (TX), GPIO 44 (RX)");
 }
 
@@ -53,11 +53,11 @@ void loop() {
     static unsigned long counter = 0;
     counter++;
 
-    // Read all limit switches
-    bool x_limit = !digitalRead(X_LIMIT_PIN);  // Invert for active-low switches
-    bool y_limit = !digitalRead(Y_LIMIT_PIN);
-    bool z_limit = !digitalRead(Z_LIMIT_PIN);
-    bool a_limit = !digitalRead(A_LIMIT_PIN);
+    // Read all limit switches (corrected logic - no inversion needed)
+    bool x_limit = digitalRead(X_LIMIT_PIN);   // HIGH = triggered, LOW = normal
+    bool y_limit = digitalRead(Y_LIMIT_PIN);
+    bool z_limit = digitalRead(Z_LIMIT_PIN);
+    bool a_limit = digitalRead(A_LIMIT_PIN);
 
     // Print status every second
     Serial1.print("Loop ");
