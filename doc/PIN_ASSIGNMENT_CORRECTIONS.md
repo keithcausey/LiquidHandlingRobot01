@@ -77,6 +77,26 @@ Before proceeding with full 4-axis integration:
    - Critical for pipette safety (vertical axis)
    - Test pull-off distance for clearance
 
+## Motor Configuration Update
+
+**Date: November 14, 2025**
+
+### Stepper Motor Specifications:
+- **Motor Type**: MKS Servo42C (all axes)
+- **Steps per Revolution**: 200 steps (full steps, no microstepping currently active)
+- **Lead Screw Pitch**: 1mm (all axes)
+- **Resolution**: 200 steps/mm (1/200th mm per step = 0.005mm per step)
+
+**Important**: Microstepping has been temporarily suspended. Current configuration uses full stepping only.
+
+### Physical Hardware Status:
+- ✅ **A-Axis**: Limit switch mounted on GPIO 17 (tested and verified)
+- ✅ **Z-Axis**: Limit switch mounted on GPIO 16 (ready for testing)
+- ⏳ **X-Axis**: Limit switch GPIO 8 assigned (not yet physically mounted)
+- ⏳ **Y-Axis**: Limit switch GPIO 15 assigned (not yet physically mounted)
+
+**Next Test**: Z-axis limit switch verification on GPIO 16
+
 ## Notes
 
 - All limit switches are configured as **Active HIGH** (consistent with A-axis testing)
