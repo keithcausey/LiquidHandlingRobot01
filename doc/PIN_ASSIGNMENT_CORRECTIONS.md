@@ -97,6 +97,55 @@ Before proceeding with full 4-axis integration:
 
 **Next Test**: Z-axis limit switch verification on GPIO 16
 
+## Axis Parameters
+
+### A-Axis (Syringe Pump) - VERIFIED
+- **Motor**: MKS Servo42C
+- **Steps/Revolution**: 200
+- **Microstepping**: 1 (full steps, no microstepping currently)
+- **Lead Screw Pitch**: 1mm
+- **Steps/mm**: 200
+- **Limit Switch GPIO**: 17 (Active HIGH)
+- **Limit Switch Direction**: Negative (-)
+- **Homing Pull-off**: 0.5mm (100 steps)
+- **Travel After Pull-off**: 41.5mm (8,300 steps)
+- **Total Physical Travel**: ~42mm
+- **Soft Limits**: 0mm to 41.5mm
+- **Status**: ✅ Fully tested and operational
+
+### Z-Axis (Vertical/Pipette) - READY FOR TEST
+- **Motor**: MKS Servo42C
+- **Steps/Revolution**: 200
+- **Microstepping**: 1 (full steps, no microstepping currently)
+- **Lead Screw Pitch**: 1mm
+- **Steps/mm**: 200
+- **Limit Switch GPIO**: 16 (Active HIGH)
+- **Limit Switch Direction**: TBD (likely positive + for top limit)
+- **Homing Pull-off**: TBD
+- **Travel**: TBD
+- **Soft Limits**: TBD
+- **Status**: ⏳ Hardware mounted, ready for configuration
+
+### X-Axis (Lateral) - PENDING
+- **Motor**: MKS Servo42C
+- **Steps/Revolution**: 200
+- **Microstepping**: 1 (full steps, no microstepping currently)
+- **Lead Screw Pitch**: 1mm
+- **Steps/mm**: 200
+- **Limit Switch GPIO**: 8 (Active HIGH)
+- **Limit Switch Direction**: TBD
+- **Status**: ⏳ Awaiting physical installation
+
+### Y-Axis (Lateral) - PENDING
+- **Motor**: MKS Servo42C
+- **Steps/Revolution**: 200
+- **Microstepping**: 1 (full steps, no microstepping currently)
+- **Lead Screw Pitch**: 1mm
+- **Steps/mm**: 200
+- **Limit Switch GPIO**: 15 (Active HIGH)
+- **Limit Switch Direction**: TBD
+- **Status**: ⏳ Awaiting physical installation
+
 ## Notes
 
 - All limit switches are configured as **Active HIGH** (consistent with A-axis testing)
