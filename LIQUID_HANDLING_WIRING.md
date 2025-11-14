@@ -83,19 +83,19 @@ Bit  Pin   Function        Available for
 ```
 ESP32-S3 Pin    Function            Connection
 ────────────    ────────────        ──────────
-GPIO 10         X_LIMIT             X-axis limit switch
-GPIO 11         Y_LIMIT             Y-axis limit switch
-GPIO 12         Z_LIMIT             Z-axis limit switch
-GPIO 13         A_LIMIT             Syringe full/empty sensor
+GPIO 8          X_LIMIT             X-axis limit switch (Active HIGH)
+GPIO 15         Y_LIMIT             Y-axis limit switch (Active HIGH)
+GPIO 16         Z_LIMIT             Z-axis limit switch (Active HIGH)
+GPIO 17         A_LIMIT             A-axis syringe position sensor (Active HIGH)
 ```
 
 ### **Control Inputs:**
 ```
 GPIO 14         PROBE               Liquid level sensor
-GPIO 15         EMERGENCY_STOP      Emergency stop button
-GPIO 16         RESET               System reset button
-GPIO 17         FEED_HOLD           Manual pause button
-GPIO 18         CYCLE_START         Start cycle button
+GPIO 10         EMERGENCY_STOP      Emergency stop button (available)
+GPIO 11         RESET               System reset button (available)
+GPIO 12         FEED_HOLD           Manual pause button (available)
+GPIO 18         CYCLE_START         Start cycle button (available)
 ```
 
 ### **System Control:**
