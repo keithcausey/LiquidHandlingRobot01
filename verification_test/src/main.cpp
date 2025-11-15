@@ -31,9 +31,9 @@ constexpr int EN_OVERRIDE_PIN = 19;          // Output to AND gate
 constexpr int EMERGENCY_FEEDBACK_PIN = 21;   // Input from AND gate
 constexpr int NEOPIXEL_PIN = 48;             // Status LED
 
-// Debug UART
-constexpr int DEBUG_UART_RX = 44;
-constexpr int DEBUG_UART_TX = 43;
+// Debug UART - USING USB SERIAL INSTEAD
+// constexpr int DEBUG_UART_RX = 44;
+// constexpr int DEBUG_UART_TX = 43;
 
 // Motor bit positions in 74HC595 cascade
 constexpr int A_STEP_BIT = 6;
@@ -41,8 +41,8 @@ constexpr int A_DIR_BIT = 7;
 
 // Motor specifications
 constexpr int STEPS_PER_REV = 200;
-constexpr int MICROSTEPS_PER_STEP = 16;
-constexpr int MICROSTEPS_PER_REV = STEPS_PER_REV * MICROSTEPS_PER_STEP;  // 3,200
+constexpr int MICROSTEPS_PER_STEP = 1;
+constexpr int MICROSTEPS_PER_REV = STEPS_PER_REV * MICROSTEPS_PER_STEP;  // 200
 constexpr float TRAVEL_EXTENT_MM = 42.0;  // Measured physical travel
 constexpr float SAFE_TRAVEL_MM = 35.0;    // Safe distance for soft limit discovery
 
@@ -103,14 +103,14 @@ void checkSafety() {
     static unsigned long lastDebug = 0;
     if (millis() - lastDebug >= 3000) {
         lastDebug = millis();
-        Serial1.print("📊 Status - Pos: ");
-        Serial1.print(motor.currentPosition);
-        Serial1.print(", Limit: ");
-        Serial1.print(motor.limitSwitchActive ? "HIT" : "clear");
-        Serial1.print(", E-Stop: ");
-        Serial1.print(motor.emergencyStop ? "ACTIVE" : "OK");
-        Serial1.print(", Homed: ");
-        Serial1.println(motor.isHomed ? "YES" : "NO");
+        Serial.print("📊 Status - Pos: ");
+        Serial.print(motor.currentPosition);
+        Serial.print(", Limit: ");
+        Serial.print(motor.limitSwitchActive ? "HIT" : "clear");
+        Serial.print(", E-Stop: ");
+        Serial.print(motor.emergencyStop ? "ACTIVE" : "OK");
+        Serial.print(", Homed: ");
+        Serial.println(motor.isHomed ? "YES" : "NO");
     }
 }
 
@@ -127,7 +127,7 @@ void updateNeoPixel() {
 
 void singleStep(bool forward) {
     if (motor.emergencyStop) {
-        Serial1.println("❌ Emergency stop active!");
+        Serial.println("❌ Emergency stop active!");
         return;
     }
     
@@ -151,26 +151,26 @@ void singleStep(bool forward) {
 }
 
 void moveSteps(int steps, bool forward) {
-    Serial1.print("Moving ");
-    Serial1.print(steps);
-    Serial1.print(forward ? " steps TOWARD limit" : " steps AWAY from limit");
-    Serial1.print(" @ ");
-    Serial1.print(motor.stepDelay);
-    Serial1.println("us/step");
+    Serial.print("Moving ");
+    Serial.print(steps);
+    Serial.print(forward ? " steps TOWARD limit" : " steps AWAY from limit");
+    Serial.print(" @ ");
+    Serial.print(motor.stepDelay);
+    Serial.println("us/step");
     
     for (int i = 0; i < steps; i++) {
         checkSafety();
         if (motor.emergencyStop) {
-            Serial1.println("❌ Stopped by emergency stop!");
+            Serial.println("❌ Stopped by emergency stop!");
             break;
         }
         if (motor.limitSwitchActive && forward) {
-            Serial1.println("⚠️ Hard limit switch hit!");
+            Serial.println("⚠️ Hard limit switch hit!");
             break;
         }
         // Check soft limit if calibrated
         if (motor.softLimitSet && !forward && motor.currentPosition >= motor.softLimit) {
-            Serial1.println("⚠️ Soft limit reached!");
+            Serial.println("⚠️ Soft limit reached!");
             break;
         }
         
@@ -178,42 +178,42 @@ void moveSteps(int steps, bool forward) {
         delay(motor.stepDelay);
         
         if ((i + 1) % 50 == 0) {
-            Serial1.print(".");
+            Serial.print(".");
         }
     }
     
-    Serial1.println("");
-    Serial1.print("✅ Complete. Position: ");
-    Serial1.println(motor.currentPosition);
+    Serial.println("");
+    Serial.print("✅ Complete. Position: ");
+    Serial.println(motor.currentPosition);
 }
 
 void homeMotor() {
-    Serial1.println("🏠 Starting homing sequence...");
+    Serial.println("🏠 Starting homing sequence...");
     
     if (motor.limitSwitchActive) {
-        Serial1.println("Already at limit switch, moving away first...");
+        Serial.println("Already at limit switch, moving away first...");
         moveSteps(100, false);  // Move away from limit
         delay(500);
     }
     
-    Serial1.println("Moving toward limit switch...");
+    Serial.println("Moving toward limit switch...");
     motor.stepDelay = HOMING_SPEED;
     
     for (int i = 0; i < 150000; i++) {  // 150,000 steps = ~47mm (more than 42mm travel)
         checkSafety();
         if (motor.emergencyStop) {
-            Serial1.println("❌ Homing aborted - emergency stop!");
+            Serial.println("❌ Homing aborted - emergency stop!");
             return;
         }
         if (motor.limitSwitchActive) {
-            Serial1.println("✅ Limit switch found!");
+            Serial.println("✅ Limit switch found!");
             motor.currentPosition = 0;
             motor.isHomed = true;
             motor.maxTravelFound = 0;
             
             // Pull off 0.5mm from limit switch (good practice for restart)
-            Serial1.println("Pulling off 0.5mm from limit...");
-            int pullOffSteps = 1600;  // 0.5mm @ 16 microsteps/step (200*16/rev ÷ 1mm pitch = 3200 steps/mm)
+            Serial.println("Pulling off 0.5mm from limit...");
+            int pullOffSteps = 100;  // 0.5mm @ 1 microstep/step (200 steps/rev ÷ 1mm pitch = 200 steps/mm)
             for (int j = 0; j < pullOffSteps; j++) {
                 singleStep(false);  // Move away from limit
                 delayMicroseconds(HOMING_SPEED);
@@ -221,9 +221,9 @@ void homeMotor() {
             motor.currentPosition = -pullOffSteps;  // Update position
             
             motor.stepDelay = NORMAL_SPEED;
-            Serial1.print("✅ Homing complete! Position: ");
-            Serial1.print(motor.currentPosition);
-            Serial1.println(" steps");
+            Serial.print("✅ Homing complete! Position: ");
+            Serial.print(motor.currentPosition);
+            Serial.println(" steps");
             return;
         }
         
@@ -231,30 +231,30 @@ void homeMotor() {
         delayMicroseconds(HOMING_SPEED);
     }
     
-    Serial1.println("❌ Homing failed - limit switch not found within 150,000 steps (~47mm)");
-    Serial1.println("💡 Check wiring or limit switch position");
+    Serial.println("❌ Homing failed - limit switch not found within 150,000 steps (~47mm)");
+    Serial.println("💡 Check wiring or limit switch position");
 }
 
 void calibrateSoftLimit() {
     if (!motor.isHomed) {
-        Serial1.println("❌ Must home first! Use 'h' command.");
+        Serial.println("❌ Must home first! Use 'h' command.");
         return;
     }
     
-    Serial1.println("🎯 Starting soft limit calibration...");
-    Serial1.print("Will travel ~");
-    Serial1.print(SAFE_TRAVEL_MM);
-    Serial1.println("mm from home");
+    Serial.println("🎯 Starting soft limit calibration...");
+    Serial.print("Will travel ~");
+    Serial.print(SAFE_TRAVEL_MM);
+    Serial.println("mm from home");
     
     // Move away from home at calibration speed
     motor.stepDelay = CALIBRATION_SPEED;
     int32_t startPos = motor.currentPosition;
     
-    Serial1.println("Moving away from home...");
+    Serial.println("Moving away from home...");
     for (int i = 0; i < 100000; i++) {  // Large number, will stop at ~35mm
         checkSafety();
         if (motor.emergencyStop) {
-            Serial1.println("❌ Calibration aborted - emergency stop!");
+            Serial.println("❌ Calibration aborted - emergency stop!");
             return;
         }
         
@@ -263,80 +263,80 @@ void calibrateSoftLimit() {
         
         // Progress indicator every 1000 steps
         if ((i + 1) % 1000 == 0) {
-            Serial1.print(".");
+            Serial.print(".");
         }
     }
     
-    Serial1.println("");
+    Serial.println("");
     int32_t travelSteps = motor.currentPosition - startPos;
     motor.softLimit = motor.currentPosition - 200;  // 200 step safety margin
     motor.softLimitSet = true;
     motor.stepsPerMm = (float)travelSteps / SAFE_TRAVEL_MM;
     
-    Serial1.println("✅ Calibration complete!");
-    Serial1.print("Traveled: ");
-    Serial1.print(travelSteps);
-    Serial1.println(" steps");
-    Serial1.print("Steps per mm: ");
-    Serial1.println(motor.stepsPerMm, 2);
-    Serial1.print("Soft limit set at: ");
-    Serial1.print(motor.softLimit);
-    Serial1.println(" steps");
+    Serial.println("✅ Calibration complete!");
+    Serial.print("Traveled: ");
+    Serial.print(travelSteps);
+    Serial.println(" steps");
+    Serial.print("Steps per mm: ");
+    Serial.println(motor.stepsPerMm, 2);
+    Serial.print("Soft limit set at: ");
+    Serial.print(motor.softLimit);
+    Serial.println(" steps");
     
     motor.stepDelay = NORMAL_SPEED;  // Restore normal speed
 }
 
 void processCommands() {
-    if (!Serial1.available()) return;
+    if (!Serial.available()) return;
     
-    String cmd = Serial1.readStringUntil('\n');
+    String cmd = Serial.readStringUntil('\n');
     cmd.trim();
     cmd.toLowerCase();
     
-    Serial1.print("Command: ");
-    Serial1.println(cmd);
+    Serial.print("Command: ");
+    Serial.println(cmd);
     
     if (cmd == "s" || cmd == "status") {
-        Serial1.println("═══ A-AXIS STATUS ═══");
-        Serial1.print("Position: ");
-        Serial1.print(motor.currentPosition);
-        Serial1.print(" steps (");
+        Serial.println("═══ A-AXIS STATUS ═══");
+        Serial.print("Position: ");
+        Serial.print(motor.currentPosition);
+        Serial.print(" steps (");
         if (motor.stepsPerMm > 0) {
-            Serial1.print(motor.currentPosition / motor.stepsPerMm, 2);
-            Serial1.println(" mm)");
+            Serial.print(motor.currentPosition / motor.stepsPerMm, 2);
+            Serial.println(" mm)");
         } else {
-            Serial1.println("not calibrated)");
+            Serial.println("not calibrated)");
         }
-        Serial1.print("Homed: ");
-        Serial1.println(motor.isHomed ? "YES" : "NO");
-        Serial1.print("Soft Limit: ");
+        Serial.print("Homed: ");
+        Serial.println(motor.isHomed ? "YES" : "NO");
+        Serial.print("Soft Limit: ");
         if (motor.softLimitSet) {
-            Serial1.print(motor.softLimit);
-            Serial1.println(" steps");
+            Serial.print(motor.softLimit);
+            Serial.println(" steps");
         } else {
-            Serial1.println("Not calibrated");
+            Serial.println("Not calibrated");
         }
-        Serial1.print("Steps/mm: ");
+        Serial.print("Steps/mm: ");
         if (motor.stepsPerMm > 0) {
-            Serial1.println(motor.stepsPerMm, 2);
+            Serial.println(motor.stepsPerMm, 2);
         } else {
-            Serial1.println("Not calibrated");
+            Serial.println("Not calibrated");
         }
-        Serial1.print("Limit Switch: ");
-        Serial1.println(motor.limitSwitchActive ? "ACTIVE" : "clear");
-        Serial1.print("Emergency Stop: ");
-        Serial1.println(motor.emergencyStop ? "ACTIVE" : "OK");
-        Serial1.print("Speed: ");
-        Serial1.print(motor.stepDelay);
-        Serial1.println(" us/step");
-        Serial1.print("Max Travel: ");
-        Serial1.print(motor.maxTravelFound);
-        Serial1.println(" steps");
+        Serial.print("Limit Switch: ");
+        Serial.println(motor.limitSwitchActive ? "ACTIVE" : "clear");
+        Serial.print("Emergency Stop: ");
+        Serial.println(motor.emergencyStop ? "ACTIVE" : "OK");
+        Serial.print("Speed: ");
+        Serial.print(motor.stepDelay);
+        Serial.println(" us/step");
+        Serial.print("Max Travel: ");
+        Serial.print(motor.maxTravelFound);
+        Serial.println(" steps");
         return;
     }
     
     if (motor.emergencyStop && cmd != "enable") {
-        Serial1.println("❌ Emergency stop active! Send 'enable' to clear.");
+        Serial.println("❌ Emergency stop active! Send 'enable' to clear.");
         return;
     }
     
@@ -348,15 +348,15 @@ void processCommands() {
     }
     else if (cmd == "slow") {
         motor.stepDelay = NORMAL_SPEED;
-        Serial1.print("Speed set to NORMAL (");
-        Serial1.print(NORMAL_SPEED);
-        Serial1.println(" us/step)");
+        Serial.print("Speed set to NORMAL (");
+        Serial.print(NORMAL_SPEED);
+        Serial.println(" us/step)");
     }
     else if (cmd == "fast") {
         motor.stepDelay = FAST_SPEED;
-        Serial1.print("Speed set to FAST (");
-        Serial1.print(FAST_SPEED);
-        Serial1.println(" us/step)");
+        Serial.print("Speed set to FAST (");
+        Serial.print(FAST_SPEED);
+        Serial.println(" us/step)");
     }
     else if (cmd.startsWith("f")) {
         float mm = cmd.substring(1).toFloat();
@@ -364,7 +364,7 @@ void processCommands() {
             int steps = (int)(mm * 3200);  // Convert mm to steps (3200 steps/mm)
             moveSteps(steps, false);  // f = away from limit
         } else {
-            Serial1.println("❌ Invalid (0.01-50.00 mm)");
+            Serial.println("❌ Invalid (0.01-50.00 mm)");
         }
     }
     else if (cmd.startsWith("b")) {
@@ -373,51 +373,51 @@ void processCommands() {
             int steps = (int)(mm * 3200);  // Convert mm to steps (3200 steps/mm)
             moveSteps(steps, true);  // b = toward limit
         } else {
-            Serial1.println("❌ Invalid (0.01-50.00 mm)");
+            Serial.println("❌ Invalid (0.01-50.00 mm)");
         }
     }
     else if (cmd.startsWith("d")) {
         int delay = cmd.substring(1).toInt();
         if (delay >= 50 && delay <= 1000) {
             motor.stepDelay = delay;
-            Serial1.print("Step delay set to ");
-            Serial1.print(delay);
-            Serial1.println(" us");
+            Serial.print("Step delay set to ");
+            Serial.print(delay);
+            Serial.println(" us");
         } else {
-            Serial1.println("❌ Invalid delay (50-1000 us)");
+            Serial.println("❌ Invalid delay (50-1000 us)");
         }
     }
     else if (cmd == "enable") {
         digitalWrite(EN_OVERRIDE_PIN, HIGH);
-        Serial1.println("✅ Motor enable set HIGH");
+        Serial.println("✅ Motor enable set HIGH");
     }
     else if (cmd == "disable") {
         digitalWrite(EN_OVERRIDE_PIN, LOW);
-        Serial1.println("⚠️ Motor enable set LOW");
+        Serial.println("⚠️ Motor enable set LOW");
     }
     else if (cmd == "help" || cmd == "?") {
-        Serial1.println("═══ COMMANDS ═══");
-        Serial1.println("Motor Specs: 200 steps/rev × 16 microsteps = 3,200 steps/rev");
-        Serial1.println("Lead screw: 1mm pitch, Travel: ~42mm physical");
-        Serial1.println("Resolution: 3,200 steps/mm (0.0003125 mm/step)");
-        Serial1.println("");
-        Serial1.println("s/status - Show detailed status");
-        Serial1.println("h/home - Home to limit switch");
-        Serial1.println("cal/calibrate - Auto-calibrate soft limit (~35mm)");
-        Serial1.println("fast - Set fast speed (50us/step)");
-        Serial1.println("slow - Set normal speed (200us/step)");
-        Serial1.println("f##.## - Forward in mm (0.01-50.00, away from limit)");
-        Serial1.println("b##.## - Backward in mm (0.01-50.00, toward limit)");
-        Serial1.println("d# - Set delay # us (50-1000)");
-        Serial1.println("enable/disable - Control GPIO19");
+        Serial.println("═══ COMMANDS ═══");
+        Serial.println("Motor Specs: 200 steps/rev × 16 microsteps = 3,200 steps/rev");
+        Serial.println("Lead screw: 1mm pitch, Travel: ~42mm physical");
+        Serial.println("Resolution: 3,200 steps/mm (0.0003125 mm/step)");
+        Serial.println("");
+        Serial.println("s/status - Show detailed status");
+        Serial.println("h/home - Home to limit switch");
+        Serial.println("cal/calibrate - Auto-calibrate soft limit (~35mm)");
+        Serial.println("fast - Set fast speed (50us/step)");
+        Serial.println("slow - Set normal speed (200us/step)");
+        Serial.println("f##.## - Forward in mm (0.01-50.00, away from limit)");
+        Serial.println("b##.## - Backward in mm (0.01-50.00, toward limit)");
+        Serial.println("d# - Set delay # us (50-1000)");
+        Serial.println("enable/disable - Control GPIO19");
     }
     else {
-        Serial1.println("❌ Unknown command. Type 'help' for commands.");
+        Serial.println("❌ Unknown command. Type 'help' for commands.");
     }
 }
 
 void setup() {
-    Serial1.begin(115200, SERIAL_8N1, DEBUG_UART_RX, DEBUG_UART_TX);
+    Serial.begin(115200);
     delay(1000);
     
     // Configure pins
@@ -436,13 +436,13 @@ void setup() {
     
     clearAllRegisters();
     
-    Serial1.println("═══════════════════════════════════");
-    Serial1.println("  Safe A-Axis Motor Test");
-    Serial1.println("═══════════════════════════════════");
-    Serial1.println("Type 'help' for commands");
-    Serial1.println("Type 'h' to home the motor");
-    Serial1.println("Type 's' for status");
-    Serial1.println("");
+    Serial.println("═══════════════════════════════════");
+    Serial.println("  Safe A-Axis Motor Test");
+    Serial.println("═══════════════════════════════════");
+    Serial.println("Type 'help' for commands");
+    Serial.println("Type 'h' to home the motor");
+    Serial.println("Type 's' for status");
+    Serial.println("");
 }
 
 void loop() {

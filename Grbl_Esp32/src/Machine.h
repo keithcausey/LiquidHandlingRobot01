@@ -10,8 +10,11 @@
 // #include "Machines/atari_1020.h"
 // #include "Machines/test_drive.h"
 
+// Liquid Handling Robot - Custom 4-axis configuration
+#    include "Machines/liquid_handling_robot.h"
+
 // ESP32-S3 4-axis CNC configuration with I2S shift registers
-#    include "Machines/esp32s3_4axis_cnc_i2s.h"
+// #    include "Machines/esp32s3_4axis_cnc_i2s.h"
 
 // !!! For actual use, change the line above to select a board
 // from Machines/, for example:

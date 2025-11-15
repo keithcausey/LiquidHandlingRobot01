@@ -1,0 +1,73 @@
+board: ESP32-S3-DevKitC-1
+name: Liquid Handling Robot
+
+i2s_out:
+  bck_pin: gpio.5      # SRCLK
+  data_pin: gpio.4     # SER
+  ws_pin: gpio.6       # RCLK
+  invert_bits: true    # For 6N136 optoisolators
+
+steppers:
+  x:
+    step_pin: i2so.0
+    dir_pin: i2so.1
+    disable_pin: i2so.8
+    steps_per_mm: 200
+    max_travel_mm: 200
+
+  y:
+    step_pin: i2so.2
+    dir_pin: i2so.3
+    disable_pin: i2so.9
+    steps_per_mm: 200
+    max_travel_mm: 200
+
+  z:
+    step_pin: i2so.4
+    dir_pin: i2so.5
+    disable_pin: i2so.10
+    steps_per_mm: 200
+    max_travel_mm: 100
+
+  a:
+    step_pin: i2so.6
+    dir_pin: i2so.7
+    disable_pin: i2so.11
+    steps_per_mm: 200
+    max_travel_mm: 41.5
+
+limit_pins:
+  x_pin: gpio.8:pu    # Active HIGH
+  y_pin: gpio.15:pu   # Active HIGH
+  z_pin: gpio.16:pu   # Active HIGH
+  a_pin: gpio.17:pu   # Active HIGH
+
+homing:
+  cycle: [z, x, y, a]
+  mpos:
+    x: 0
+    y: 0
+    z: 0
+    a: 0
+  feed_rate: 100
+  seek_rate: 500
+  debounce_ms: 250
+  pull_off_mm: 0.5
+
+control:
+  safety_door_pin: gpio.10
+  reset_pin: gpio.11
+  feed_hold_pin: gpio.18
+  motor_fault_pin: gpio.21  # Safety feedback
+
+wifi:
+  ssid: NETGEAR13
+  password: dynamicnest700
+
+webui:
+  enable: true
+  port: 80
+
+telnet:
+  enable: true
+  port: 23

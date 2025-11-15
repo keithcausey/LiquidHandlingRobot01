@@ -86,29 +86,30 @@
 #define A_DISABLE_PIN   I2SO(11)  // Register 1, bit 3
 
 // === LIMIT SWITCHES (Direct GPIO, Active HIGH) ===
-#define X_LIMIT_PIN     GPIO_NUM_8   // X-axis limit switch
-#define Y_LIMIT_PIN     GPIO_NUM_15  // Y-axis limit switch
-#define Z_LIMIT_PIN     GPIO_NUM_16  // Z-axis limit switch (MOUNTED)
-#define A_LIMIT_PIN     GPIO_NUM_17  // A-axis syringe position sensor (TESTED)
+// TEMPORARILY DISABLED FOR MOTOR TESTING
+// #define X_LIMIT_PIN     GPIO_NUM_8   // X-axis limit switch
+// #define Y_LIMIT_PIN     GPIO_NUM_15  // Y-axis limit switch
+// #define Z_LIMIT_PIN     GPIO_NUM_16  // Z-axis limit switch (MOUNTED)
+// #define A_LIMIT_PIN     GPIO_NUM_17  // A-axis syringe position sensor (TESTED)
 
 // === PROBE INPUT ===
-#define PROBE_PIN       GPIO_NUM_14  // Liquid level sensor
+// TEMPORARILY DISABLED FOR MOTOR TESTING
+// #define PROBE_PIN       GPIO_NUM_14  // Liquid level sensor
 
 // === CONTROL INPUTS (Available for future use) ===
 #define CONTROL_SAFETY_DOOR_PIN   GPIO_NUM_10  // Emergency stop (available)
 #define CONTROL_RESET_PIN         GPIO_NUM_11  // Reset button (available)
-#define CONTROL_FEED_HOLD_PIN     GPIO_NUM_12  // Feed hold (available)
 #define CONTROL_CYCLE_START_PIN   GPIO_NUM_18  // Cycle start (available)
 
 // === SAFETY SYSTEM ===
-#define STEPPER_RESET_PIN GPIO_NUM_19  // Output to AND gate for all drivers
-// GPIO 21 is used for safety feedback monitoring (not defined as GRBL pin)
+#define STEPPER_RESET         GPIO_NUM_19  // Output to AND gate for all drivers (must be HIGH to enable)
+// #define CONTROL_FEED_HOLD_PIN     GPIO_NUM_21  // Safety feedback from AND gate (TEMPORARILY DISABLED for motor testing)
 
 // === SPINDLE/AUXILIARY CONTROL ===
-// Using "spindle" outputs for liquid handling pumps
-#define SPINDLE_TYPE            SpindleType::PWM
-#define SPINDLE_OUTPUT_PIN      GPIO_NUM_21    // Variable speed pump control
-#define SPINDLE_ENABLE_PIN      GPIO_NUM_NC    // Use PWM pin for enable
+// Spindle disabled - using GPIO 21 for safety feedback instead
+#define SPINDLE_TYPE            SpindleType::NONE
+// #define SPINDLE_OUTPUT_PIN      GPIO_NUM_21    // Now used for safety feedback
+// #define SPINDLE_ENABLE_PIN      GPIO_NUM_NC
 
 // === COOLANT/ACCESSORY OUTPUTS (via shift registers) ===
 // Repurposed for liquid handling accessories
@@ -144,7 +145,7 @@
 #define DEFAULT_A_MAX_TRAVEL 41.5     // mm (VERIFIED: 41.5mm after 0.5mm pull-off)
 
 // === HOMING SETTINGS ===
-#define DEFAULT_HOMING_ENABLE true
+#define DEFAULT_HOMING_ENABLE false  // DISABLED for motor testing
 #define DEFAULT_HOMING_DIR_MASK 0     // All axes home to negative direction initially
 #define DEFAULT_HOMING_FEED_RATE 100.0      // mm/min search rate
 #define DEFAULT_HOMING_SEEK_RATE 500.0      // mm/min fast rate
@@ -153,7 +154,7 @@
 
 // === MACHINE LIMITS ===
 #define DEFAULT_SOFT_LIMIT_ENABLE false  // Enable after measuring travel
-#define DEFAULT_HARD_LIMIT_ENABLE true   // Hardware limit switches enabled
+#define DEFAULT_HARD_LIMIT_ENABLE false  // DISABLED for motor testing
 
 // === STEPPER CONFIGURATION ===
 #define DEFAULT_STEP_PULSE_MICROSECONDS 3
@@ -162,7 +163,7 @@
 // === DIRECTION INVERSION ===
 // To be configured based on actual motor wiring
 #define DEFAULT_INVERT_ST_ENABLE false  // MKS Servo42C uses Active LOW enable
-#define DEFAULT_INVERT_LIMIT_PINS true  // Limit switches are Active HIGH
+#define DEFAULT_INVERT_LIMIT_PINS false  // Limit switches are Active HIGH (no inversion needed)
 
 #define DEFAULT_X_HOMING_MPOS 0.0
 #define DEFAULT_Y_HOMING_MPOS 0.0
@@ -176,9 +177,6 @@
 #define ENABLE_HTTP
 #define ENABLE_MDNS
 
-// WiFi defaults (can be changed via web interface)
-#define DEFAULT_WIFI_MODE WiFiMode::AP  // Start as Access Point
-#define DEFAULT_AP_SSID "LiquidHandlingRobot"
-#define DEFAULT_AP_PASSWORD "robot123"
+// WiFi defaults can be configured via web interface or $SSID commands
 
 // clang-format on
